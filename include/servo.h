@@ -25,10 +25,12 @@ typedef enum {
   true
 } bool;
 
+/*
 enum {
   DISABLE,
   ENABLE
 };
+*/
 
 enum {
   PRIORITY_LOW    = 1,

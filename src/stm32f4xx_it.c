@@ -23,29 +23,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_it.h"
-#include "main.h"
-#include "usb_core.h"
-#include "usbd_core.h"
 #include "stm32f4_discovery.h"
-#include "usbd_hid_core.h"
-
-/* Private typedef -----------------------------------------------------------*/
-/* Private define ------------------------------------------------------------*/
-#define CURSOR_STEP     7
-
-extern uint8_t Buffer[6];
-/* Private macro -------------------------------------------------------------*/
-/* Private variables ---------------------------------------------------------*/
-extern __IO uint8_t DemoEnterCondition;
-uint8_t Counter  = 0x00;
-extern int8_t X_Offset;
-extern int8_t Y_Offset;
-extern __IO uint8_t UserButtonPressed;
-__IO uint8_t TempAcceleration = 0;
-/* Private function prototypes -----------------------------------------------*/
-extern USB_OTG_CORE_HANDLE           USB_OTG_dev;
-static uint8_t *USBD_HID_GetPos (void);
-extern uint32_t USBD_OTG_ISR_Handler (USB_OTG_CORE_HANDLE *pdev);
 
 /******************************************************************************/
 /*            Cortex-M3 Processor Exceptions Handlers                         */
