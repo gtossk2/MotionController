@@ -1,0 +1,3 @@
+[submodule "STM32F4"]
+  path = STM32F4
+  url = https://github.com/mechoid9/STM32F4.git

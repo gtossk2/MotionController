@@ -1,8 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "stm32f4xx_conf.h"
 #include "servo.h"
 #include "MotionManager.h"
+
+// TODO Add timer to EXIT for toggling LED that make sure system is alive
+// TODO Add EXIT to handle UART message  
 
 extern MotionManager motionManager;
 extern Operator default_OP;
