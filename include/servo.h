@@ -17,6 +17,8 @@
 #define MAX_PULSE_WIDTH         2400
 #define CENTER_PULSE_WIDTH      1500
 
+#define MAX_SERVO_NUMBER        24
+
 /*
  * Enum macro
  */
@@ -49,14 +51,14 @@ typedef struct _servo       Servo;
  *  Function APIs
  */
 
-#define SET_SERVO_POSITION( obj, pos )                          \
-  do {                                                          \
-    ((Servo *)(obj))->op->setPosition((Servo *)(obj), pos);     \
+#define SET_SERVO_POSITION( obj )                          \
+  do {                                                     \
+    ((Servo *)(obj))->op->setPosition((Servo *)(obj));     \
   } while(0)
 
 #define GET_SERVO_POSITION( obj, pos )                          \
   do {                                                          \
-    ((Servo *)(obj))->op->getPosition((Servo *)(obj), pos);  \
+    ((Servo *)(obj))->op->getPosition((Servo *)(obj), pos);     \
   } while(0)
 
 
@@ -64,7 +66,7 @@ typedef struct _servo       Servo;
  *  Abstraction Interface
  */
 struct _operator {
-  void  (*setPosition)(Servo *servo, int position);
+  void  (*setPosition)(Servo *servo);
   void  (*getPosition)(Servo *servo, int *position);
   void  (*validatePosition)(Servo *servo, int position, bool *valid);
 
@@ -100,12 +102,12 @@ struct _servo {
  */
 int map(int pos, int servo_min, int servo_max);
 int parseCmd(char *cmd);
-void updatePositionFromCmd(char *cmd);
+void updatePositionFromCmd(char *idx, char *position);
 
 /*
  * Implementation Method
  */
-void setPosition(Servo *servo, int position);
+void setPosition(Servo *servo);
 void getPosition(Servo *servo, int *position);
 void validatePosition(Servo *servo, int position, bool *valid);
 

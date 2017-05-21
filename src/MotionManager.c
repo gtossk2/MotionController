@@ -1,4 +1,8 @@
 #include "MotionManager.h"
+#include "Uart.h"
+#include "Message.h"
+
+extern Message gRequest;
 
 /*
  *  Singleton Instance
@@ -13,15 +17,15 @@ MotionManager motionManager = {
  *  Implementation Method
  */
 void schedule_process(Servo* servos, unsigned int servoNum){
-  // TODO
-  int idx;
+  int idx = 0;
 
-  printf("Motion updating ... \n");
-  for(idx = 0; idx < servoNum; ++idx){
-    printf("\t");
-    SET_SERVO_POSITION( (Servo *)(servos+idx), 100);
+  //USART_puts(USART1, "Motion updating ... ");
+  /* Set servo poition from its property */
+  for(idx = 0; idx < servoNum; ++idx)
+  {
+    SET_SERVO_POSITION( (Servo *)(servos+idx));
   }
-  printf("Done.\n");
+  //USART_puts(USART1, "Done.\r\n");
 };
 
 void startLogging(void){

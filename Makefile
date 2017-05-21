@@ -77,3 +77,10 @@ burn: proj
 		-c "flash write_image erase $(PROJ_NAME).bin 0x8000000" \
 		-c "reset run" -c shutdown || \
 	st-flash write $(PROJ_NAME).bin 0x8000000
+
+
+gdb:
+	arm-none-eabi-gdb -q -iex 'add-auto-load-safe-path /' .gdbinit $(PROJ_NAME).elf
+
+openocd:
+	openocd -f board/stm32f4discovery.cfg

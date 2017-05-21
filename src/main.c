@@ -4,13 +4,14 @@
 #include "stm32f4xx_conf.h"
 #include "servo.h"
 #include "MotionManager.h"
+#include "Uart.h"
+#include "pwm.h"
 
-// TODO Add timer to EXIT for toggling LED that make sure system is alive
-// TODO Add EXIT to handle UART message  
+extern MotionManager  motionManager;
+extern Operator       default_OP;
+extern Servo          servo[2];
 
-extern MotionManager motionManager;
-extern Operator default_OP;
-
+/*
 Servo servo[2] = {
   {
     .op = &default_OP,
@@ -31,15 +32,42 @@ Servo servo[2] = {
     .status = ENABLE,
     .offset = 0 }
 };
+*/
 
 int main(){
-  int pos = 0;
 
-  SET_SERVO_POSITION(&servo[0], 122);
-  GET_SERVO_POSITION(&servo[0], &pos);
+  init_PWM_Configuration();
 
-  motionManager.process(servo, 2);
+  initUSART1(115200);
+  USART_puts(USART1, "Test Uart Complete! \r\n");
+
+  //RCC->AHB1ENR |= RCC_AHB1ENR_GPIODEN;
+  //GPIOD->MODER = (1 << 26);
+  //SysTick_Config(16000000);
+  
+  while(1){
+  };
 
   return 0;
 }
 
+/*
+ *  Move SysTick_Handler Here.
+ */
+/*
+void SysTick_Handler(void) {
+  //GPIOD->ODR ^= (1 << 13);
+  //motionManager.process(servo, 2);
+}
+*/
+
+void TIM2_IRQHandler(void){
+ 
+  if(TIM_GetITStatus(TIM2, TIM_IT_Update) == SET){
+    /* Update servo position periodically */
+    motionManager.process(servo, 2);
+
+    /* Clear IT pending Bit */
+    TIM_ClearITPendingBit(TIM2, TIM_FLAG_Update);
+  }
+}

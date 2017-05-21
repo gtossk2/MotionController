@@ -1,4 +1,5 @@
 #include "servo.h"
+#include "stm32f4xx_conf.h"
 
 #include <stdlib.h>
 
@@ -22,12 +23,44 @@ Operator default_OP = {
   .setID = NULL
 };
 
+Servo servo[2] = {
+  {
+    .op = &default_OP,
+    .id = 0,
+    .priority = PRIORITY_MID,
+    .position = 0,
+    .max_position = MAX_SERVO_DEGREE,
+    .min_position = MIN_SERVO_DEGREE,
+    .status = ENABLE,
+    .offset = 0 },
+  {
+    .op = &default_OP,
+    .id = 1,
+    .priority = PRIORITY_MID,
+    .position = 0,
+    .max_position = MAX_SERVO_DEGREE,
+    .min_position = MIN_SERVO_DEGREE,
+    .status = ENABLE,
+    .offset = 0 }
+};
+
 extern int gPosition;
 extern char gCmd[50];
 
-void setPosition(Servo *servo, int position){
-  servo->position = position;
-  printf("Set ID: %d to %d \n", servo->id, servo->position);
+void setPosition(Servo *servo){
+
+  switch(servo->id){
+    case 0:
+      TIM4->CCR1 = map(servo->position, servo->min_position, servo->max_position);
+    case 1:
+      TIM4->CCR2 = map(servo->position, servo->min_position, servo->max_position);
+    case 2:
+      TIM4->CCR3 = map(servo->position, servo->min_position, servo->max_position);
+    case 3:
+      TIM4->CCR4 = map(servo->position, servo->min_position, servo->max_position);
+    default:
+      break;
+  }
 }
 
 void getPosition(Servo *servo, int *position){
@@ -74,15 +107,33 @@ int parseCmd(char *cmd){
   return res;
 }
 
-void updatePositionFromCmd(char *cmd){
-  int position = 0;
+static int isValidated(int idx, int position){
+  if(idx > -1 && idx < MAX_SERVO_NUMBER){
 
-  position = parseCmd(cmd);
-  //if(!validatePosition(position))
-  //  return;
+    if(position > servo[idx].min_position || position < servo[idx].max_position)
+      return 1;
+
+    return 0;
+  }
+
+  return 0;
+}
+
+static void updatePosition(Servo *servo, int position){
+  servo->position = position;
+  return;
+}
+
+void updatePositionFromCmd(char *idx, char *position){
+  int _position = atoi(position);
+  int _idx = atoi(idx);
+
+  //TODO : validate the incoming request
+  if(!isValidated(_idx, _position))
+    return;
   
   //enterCritical();
-  gPosition = position;
+  updatePosition(&servo[_idx], _position);
   //exitCritical();
 
  return;

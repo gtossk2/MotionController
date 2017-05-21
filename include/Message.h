@@ -12,7 +12,7 @@ typedef struct _protocol Protocol;
 /*
  *  Implementation Method
  */
-int _parseMessage(unsigned char* data, unsigned int dataSize);
+int _parseMessage(char* data, unsigned int dataSize);
 
 // 1. Error detect
 // 2. Easy parsse
@@ -21,11 +21,11 @@ int _parseMessage(unsigned char* data, unsigned int dataSize);
 // Max 24 Servo
 // Start bit : #
 // ID : 00 ~ 24
-// Position : -180 ~ +180
+// Position : 0 ~ 180
 // Commnad : S/G
 // End bit : ;
 //
-// #00S+123;#01S+180;#03-012;
+// #00S123;#01S180;#03S0;
 //
 // 115200 bits/second (14400 bytes)
 // 1 servos = 10 bytes, 24 servos = 240 bytes (MAX)
@@ -33,16 +33,16 @@ int _parseMessage(unsigned char* data, unsigned int dataSize);
 
 // Protocol abstration
 struct _protocol {
-  int (*parseMessage)(unsigned char* data, unsigned int dataSize);
+  int (*parseMessage)(char* data, unsigned int dataSize);
 };
 
 struct _message {
   Protocol protocol;
 
-  uint8_t start[1];
-  uint8_t id[3];
-  uint8_t position[5];
-  uint8_t end[1];
+  char start[1];
+  char id[3];
+  char position[5];
+  char end[1];
 };
 
 /*
@@ -53,5 +53,5 @@ struct _message {
     ((Message *)(obj))->protocol.parseMessage( data, size );   \
   } while(0)    
 
-extern Message message;
+extern Message gRequest;
 #endif

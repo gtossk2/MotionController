@@ -1,7 +1,11 @@
 #include <string.h>
+
+#include "Message.h"
 #include "Uart.h"
 
 #define MESSAGE_SIZE  100
+
+extern Message gRequest;
 
 char gMessage[MESSAGE_SIZE];
 
@@ -59,7 +63,7 @@ void initUSART1(uint32_t baudrate){
   NVIC_Init(&NVIC_InitStruct);
 };
 
-void USART_puts(USART_TypeDef *USARTx, volatile char *s){
+void USART_puts(USART_TypeDef *USARTx, char *s){
   while(*s){
     // Wait until the data register is empty
     while( USART_GetFlagStatus(USARTx, USART_FLAG_TXE) == RESET );
@@ -88,15 +92,16 @@ void USART1_IRQHandler(){
 
   if( USART_GetITStatus(USART1, USART_IT_RXNE) ){
     incomingByte = (uint8_t) USART_ReceiveData(USART1);
-    USART_puts(USART1, (volatile char*) &incomingByte); // Do echo-ing
+    USART_puts(USART1, &incomingByte); // Do echo-ing
   } 
   
   if( incomingByte == '\n' || incomingByte == '\r'){
     USART_puts(USART1, "\r\nRec : ");
     USART_puts(USART1, gMessage);
     USART_puts(USART1, "\r\n");
-    // TODO : Message Process Here
 
+    // TODO : Message Process Here
+    PARSE_MESSAGE(&gRequest, (char *) &gMessage[0], messageCnt);
     messagePtr = clearMessage(gMessage, &messageCnt);
   } else {
     *messagePtr++ = incomingByte;

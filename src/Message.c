@@ -1,36 +1,52 @@
 #include "Message.h"
+#include "Uart.h"
+#include "servo.h"
 
 #include <string.h>
 #include <stdio.h>
 
-Message message = {
+Message gRequest = {
   .protocol.parseMessage = _parseMessage 
 };
 
-int _parseMessage(unsigned char* data, unsigned int dataSize) {
+int _parseMessage(char* data, unsigned int dataSize) {
   int element;
-  char *pch;  
+  char *pch;
+
+  // Debug
+  USART_puts(USART1, data);
+  USART_puts(USART1, "\r\n");
 
   if(!data){
-    printf("data is not available.\n");
+    USART_puts(USART1, "data is not available.\r\n");
     return -1;
   }
 
-  pch = strtok(data, ";");
+  pch = strtok((char *)data, ";");
   while(pch != NULL){
 
-    element = sscanf(pch, "#%2[^S]S%4[^;];", message.id, message.position);
+    // DEBUG: Cannot detect +/- for sscanf
+    element = sscanf(pch, "#%2[^S]S%4[^;];", gRequest.id, gRequest.position);
     if(element != 2){
       // TODO Error handler
-      printf("Wrong Parameter ... \n");
+      USART_puts(USART1, "\r\nWrong Parameter ... \r\n");
       return -1;
     } else {
       // TODO
-      printf("Element : %d \n", element);
-      printf("ID : %s , Position : %s \n", message.id, message.position);
+      USART_puts(USART1, gRequest.id);
+      USART_puts(USART1, " : ");
+      USART_puts(USART1, gRequest.position);
+      USART_puts(USART1, "\r\n");
+
+      // Set Servo Position
+      updatePositionFromCmd(gRequest.id, gRequest.position);
+
+      USART_puts(USART1, "Parse incoming request successfully \r\n");
     }
     pch = strtok(NULL, ";");
   }
 
   return 0;
 };
+
+
