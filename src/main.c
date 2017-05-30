@@ -36,7 +36,7 @@ Servo servo[2] = {
 
 int main(){
 
-  init_PWM_Configuration();
+  init_PWM_Configuration(2);
 
   initUSART1(115200);
   USART_puts(USART1, "Test Uart Complete! \r\n");
@@ -61,13 +61,12 @@ void SysTick_Handler(void) {
 }
 */
 
-void TIM2_IRQHandler(void){
- 
-  if(TIM_GetITStatus(TIM2, TIM_IT_Update) == SET){
+void TIM8_TRG_COM_TIM14_IRQHandler(void){
+  if(TIM_GetITStatus(TIM14, TIM_IT_Update) == SET){
     /* Update servo position periodically */
     motionManager.process(servo, 2);
 
     /* Clear IT pending Bit */
-    TIM_ClearITPendingBit(TIM2, TIM_FLAG_Update);
+    TIM_ClearITPendingBit(TIM14, TIM_FLAG_Update);
   }
 }

@@ -1,7 +1,13 @@
 #include "servo.h"
+#include "pwm.h"
 #include "stm32f4xx_conf.h"
+#include "Uart.h"
 
 #include <stdlib.h>
+
+extern int gPosition;
+extern char gCmd[50];
+extern PWM_CHANNEL* gChannel[4][4];
 
 Operator default_OP = {
   .setPosition = setPosition,
@@ -44,23 +50,14 @@ Servo servo[2] = {
     .offset = 0 }
 };
 
-extern int gPosition;
-extern char gCmd[50];
-
 void setPosition(Servo *servo){
+  int timer = servo->id / 4;
+  int channel = servo->id % 4;
+  int value = 0;
 
-  switch(servo->id){
-    case 0:
-      TIM4->CCR1 = map(servo->position, servo->min_position, servo->max_position);
-    case 1:
-      TIM4->CCR2 = map(servo->position, servo->min_position, servo->max_position);
-    case 2:
-      TIM4->CCR3 = map(servo->position, servo->min_position, servo->max_position);
-    case 3:
-      TIM4->CCR4 = map(servo->position, servo->min_position, servo->max_position);
-    default:
-      break;
-  }
+  // Set value to register
+  value = map(servo->position, servo->min_position, servo->max_position);
+  gChannel[timer][channel](value);
 }
 
 void getPosition(Servo *servo, int *position){

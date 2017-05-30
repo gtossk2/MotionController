@@ -1,7 +1,9 @@
 #ifndef _PWN_H_
 #define _PWM_H_
 
-void init_PWM_Configuration(void);
+typedef void PWM_CHANNEL(int value);
+
+void init_PWM_Configuration(int servo_number);
 
 void PWM_RCC_Configuration(void);
 void PWM_GPIO_Configuration(void);
