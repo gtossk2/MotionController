@@ -122,11 +122,12 @@ void PendSV_Handler(void)
   * @param  None
   * @retval None
   */
+// Implemented in system.c
+/*
 void SysTick_Handler(void)
 {
-  // TODO Add the timer to execute the process of the motion manager per 20 ms
-
 }
+*/
 
 /******************************************************************************/
 /*                 STM32Fxxx Peripherals Interrupt Handlers                   */

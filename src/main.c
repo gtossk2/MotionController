@@ -6,6 +6,7 @@
 #include "MotionManager.h"
 #include "Uart.h"
 #include "pwm.h"
+#include "system.h"
 
 extern MotionManager  motionManager;
 extern Operator       default_OP;
@@ -35,31 +36,26 @@ Servo servo[2] = {
 */
 
 int main(){
+  unsigned int currentTime = 0,
+               previousTime = 0;
 
+  systemInit();
   init_PWM_Configuration(2);
-
   initUSART1(115200);
   USART_puts(USART1, "Test Uart Complete! \r\n");
-
-  //RCC->AHB1ENR |= RCC_AHB1ENR_GPIODEN;
-  //GPIOD->MODER = (1 << 26);
-  //SysTick_Config(16000000);
   
   while(1){
+    currentTime = micros();
+
+    if((currentTime - previousTime) > 2000000){
+      USART_puts(USART1, "Timesup for 2 seconds\r\n");
+
+      previousTime = currentTime;
+    }
   };
 
   return 0;
 }
-
-/*
- *  Move SysTick_Handler Here.
- */
-/*
-void SysTick_Handler(void) {
-  //GPIOD->ODR ^= (1 << 13);
-  //motionManager.process(servo, 2);
-}
-*/
 
 void TIM8_TRG_COM_TIM14_IRQHandler(void){
   if(TIM_GetITStatus(TIM14, TIM_IT_Update) == SET){
