@@ -33,7 +33,7 @@ Servo servo[2] = {
   {
     .op = &default_OP,
     .id = 0,
-    .priority = PRIORITY_MID,
+    //.priority = PRIORITY_MID,
     .position = 0,
     .max_position = MAX_SERVO_DEGREE,
     .min_position = MIN_SERVO_DEGREE,
@@ -42,7 +42,7 @@ Servo servo[2] = {
   {
     .op = &default_OP,
     .id = 1,
-    .priority = PRIORITY_MID,
+    //.priority = PRIORITY_MID,
     .position = 0,
     .max_position = MAX_SERVO_DEGREE,
     .min_position = MIN_SERVO_DEGREE,

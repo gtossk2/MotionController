@@ -7,6 +7,7 @@
 #include "Uart.h"
 #include "pwm.h"
 #include "system.h"
+#include "schedule.h"
 
 extern MotionManager  motionManager;
 extern Operator       default_OP;
@@ -36,8 +37,6 @@ Servo servo[2] = {
 */
 
 int main(){
-  unsigned int currentTime = 0,
-               previousTime = 0;
 
   systemInit();
   init_PWM_Configuration(2);
@@ -45,13 +44,7 @@ int main(){
   USART_puts(USART1, "Test Uart Complete! \r\n");
   
   while(1){
-    currentTime = micros();
-
-    if((currentTime - previousTime) > 2000000){
-      USART_puts(USART1, "Timesup for 2 seconds\r\n");
-
-      previousTime = currentTime;
-    }
+    scheduler();
   };
 
   return 0;

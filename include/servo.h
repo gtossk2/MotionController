@@ -34,11 +34,13 @@ enum {
 };
 */
 
+/*
 enum {
   PRIORITY_LOW    = 1,
   PRIORITY_MID    = 2,
   PRIORITY_HIGH   = 3,
 };
+*/
 
 /*
  *  Forward declaration
