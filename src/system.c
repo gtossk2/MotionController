@@ -7,6 +7,8 @@ static volatile int sysTickPending = 0;
 
 void SysTick_Handler(void){
   // TODO ATOMIC BLOCK
+  SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
+
   sysTickUptime++;
   sysTickPending = 0;
   (void)(SysTick->CTRL);
@@ -20,7 +22,8 @@ void systemInit(void){
   sysCoreClock = clocks.SYSCLK_Frequency;
 
   // Generate 1K hz for ms
-  if(SysTick_Config(sysCoreClock / 1000)){
+  //if(SysTick_Config(sysCoreClock / 1000)){
+  if(SysTick_Config(0xFFFFFF - 1)){
     // TODO Error Handler
     //USART_puts(USART1, "sysTick is not supported! \r\n");
   }

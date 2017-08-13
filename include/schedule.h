@@ -40,7 +40,7 @@ typedef struct {
   uint8_t    staticPriority;
   timeUs     periodExecuteTime;
   timeUs     lastExecuteTime;
-  timeUs    maxExecuteTime;
+  timeUs     maxExecuteTime;
 }TaskInfo;
 
 /*
@@ -52,7 +52,7 @@ typedef struct {
   bool       (*checkFunc)(timeUs currentTime, timeUs currentDeltaTime);
   // Time-driven TASK
   void       (*taskFunc)(timeUs currentTime);
-  
+
   // Time information
   timeUs     periodExecuteTime;
   timeUs     lastExecuteTime;
@@ -62,6 +62,10 @@ typedef struct {
   uint8_t    staticPriority;
   uint8_t    dynamicPriority;
   uint8_t    taskAge;  
+
+  // Task stack
+  void *stack;
+  void *orig_stack;
 }Task;
 
 /*
@@ -69,5 +73,6 @@ typedef struct {
  */
 void schedulerInit(void);
 void scheduler(void);
+void thread_start(void);
 
 #endif

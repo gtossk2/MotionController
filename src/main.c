@@ -9,6 +9,15 @@
 #include "system.h"
 #include "schedule.h"
 
+/*
+ *  TODO :
+ *    1. Context switch (O)
+ *    2. TASK priority and interrupt
+ *    3. Mutex/Semaphore/Critical Section
+ *    4. IPC: Shared memory/Message Queue/Pipe
+ *
+ */
+
 extern MotionManager  motionManager;
 extern Operator       default_OP;
 extern Servo          servo[2];
@@ -38,24 +47,32 @@ Servo servo[2] = {
 
 int main(){
 
-  systemInit();
-  init_PWM_Configuration(2);
   initUSART1(115200);
   USART_puts(USART1, "Test Uart Complete! \r\n");
   
+  systemInit();
+  init_PWM_Configuration(2);
+
+  schedulerInit();
+  thread_start();
+
   while(1){
-    scheduler();
+    //scheduler();
   };
 
   return 0;
 }
 
 void TIM8_TRG_COM_TIM14_IRQHandler(void){
+
   if(TIM_GetITStatus(TIM14, TIM_IT_Update) == SET){
     /* Update servo position periodically */
-    motionManager.process(servo, 2);
+    //motionManager.process(servo, 2);
 
     /* Clear IT pending Bit */
     TIM_ClearITPendingBit(TIM14, TIM_FLAG_Update);
+
+    //USART_puts(USART1, "Set pendsv ... \r\n");
+    //SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
   }
 }
