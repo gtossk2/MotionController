@@ -47,6 +47,11 @@ typedef struct {
  * Task struct
  */
 typedef struct {
+  // Task stack
+  void       *stack;
+  void       *orig_stack;
+  uint8_t    in_use;
+
   const char *taskName;
   // Event-driven TASK
   bool       (*checkFunc)(timeUs currentTime, timeUs currentDeltaTime);
@@ -61,17 +66,13 @@ typedef struct {
   // Task priority
   uint8_t    staticPriority;
   uint8_t    dynamicPriority;
-  uint8_t    taskAge;  
-
-  // Task stack
-  void *stack;
-  void *orig_stack;
+  uint8_t    taskAge;
 }Task;
 
 /*
  *  Scheduler APIs
  */
-void schedulerInit(void);
+int schedulerInit(void);
 void scheduler(void);
 void thread_start(void);
 

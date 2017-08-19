@@ -10,8 +10,8 @@ void SysTick_Handler(void){
   SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
 
   sysTickUptime++;
-  sysTickPending = 0;
-  (void)(SysTick->CTRL);
+  //sysTickPending = 0;
+  //(void)(SysTick->CTRL);
 };
 
 void systemInit(void){

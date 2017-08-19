@@ -27,7 +27,7 @@ static void __delay(volatile int count){
 static void task1(timeUs time){
   while(1){
     USART_puts(USART1, "Task1 is running\r\n");
-    __delay(10000);
+    __delay(1);
   }
 }
 
@@ -35,14 +35,14 @@ static void task1(timeUs time){
 static void task2(timeUs time){
   while(1){
     USART_puts(USART1, "Task2 is running\r\n");
-    __delay(10000);
+    __delay(1);
   }
 }
 
 /*
  *  Initializing global tasks
  */
-Task gTasks[TASK_TOTAL] = {
+static Task gTasks[TASK_TOTAL] = {
   [TASK_MOTION_MANAGER] = {
     .taskName = "MotionManager",
     .taskFunc = task1,
@@ -51,7 +51,7 @@ Task gTasks[TASK_TOTAL] = {
   },
   [TASK_TEST] = {
     .taskName = "Test",
-    .taskFunc = task2,
+    .taskFunc = task1,
     .periodExecuteTime = TASK_PEROID_HZ(1),
     .staticPriority = PRIORITY_MEDIUM
   },
@@ -61,34 +61,33 @@ Task gTasks[TASK_TOTAL] = {
  * pointer. If so, after restoring the tasks' context, we will get wrong stack
  * pointer.
  */
-void __attribute__((naked)) Test_PendSV_Handler(){
-  USART_puts(USART1, "processing pendsv \r\n");
-}
-
 void __attribute__((naked)) PendSV_Handler(){
-  USART_puts(USART1, "processing pendsv \r\n");
-
   /* Save the old task's context */
   asm volatile("mrs   r0, psp\n"
       "stmdb r0!, {r4-r11, lr}\n");
   /* To get the task pointer address from result r0 */
-  asm volatile("mov   %0, r0\n" : "=r" (gTasks[gTaskID].stack));
+  asm volatile("mov   %0, r0\n" : "=r"(gTasks[gTaskID].stack));
 
   /* Find a new task to run */
-  while (1)
-  {
+  while (1){
     gTaskID++;
-    if (gTaskID == TASK_TOTAL)
+    if (gTaskID == TASK_TOTAL){
       gTaskID = 0;
-
-    USART_puts(USART1, "switching the context ...  \r\n");
-    /* Move the task's stack pointer address into r0 */
-    asm volatile("mov r0, %0\n" : : "r" (gTasks[gTaskID].stack));
-    /* Restore the new task's context and jump to the task */
-    asm volatile("ldmia r0!, {r4-r11, lr}\n"
-        "msr psp, r0\n"
-        "bx lr\n");
+    }
+    if(gTasks[gTaskID].in_use){
+      /* Move the task's stack pointer address into r0 */
+      // DEBUG : fail to switch task stack
+      asm volatile("mov r0, %0\n" : : "r" (gTasks[gTaskID].stack));
+      /* Restore the new task's context and jump to the task */
+      asm volatile("ldmia r0!, {r4-r11, lr}\n"
+          "msr psp, r0\n"
+          "bx lr\n");
+    }
   }
+}
+
+static void thread_self_terminal(){
+  while(1);
 }
 
 void thread_start(void)
@@ -113,14 +112,17 @@ void thread_start(void)
       "bx lr\n");
 }
 
-void schedulerInit(void){
-  // TODO
+int schedulerInit(void){
   int idx = 0;
   uint32_t *stack;
+
   for(idx = 0; idx < TASK_TOTAL; ++idx){
     // Create task stack
     stack = (uint32_t *) malloc(STACK_SIZE * sizeof(uint32_t));
-    if(!stack) return;
+    if(!stack) {
+      return 0;
+    }
+
     gTasks[idx].orig_stack = stack;
 
     stack += STACK_SIZE - 32; // End of task, minus what we are about to push
@@ -131,13 +133,16 @@ void schedulerInit(void){
     } else {
       stack[8] = (unsigned int) THREAD_PSP;
       stack[9] = (unsigned int) gTasks[idx].taskName;
-      stack[14] = 0;
+      stack[14] = (unsigned int) &thread_self_terminal;
       stack[15] = (unsigned int) gTasks[idx].taskFunc;
       stack[16] = (unsigned int) 0x01000000; // PSR Thumb bit
     }
 
     gTasks[idx].stack = stack;
+    gTasks[idx].in_use = 1;
   }
+
+  return 1;
 }
 
 void scheduler(void){

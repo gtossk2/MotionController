@@ -24,7 +24,7 @@ STM_LIBRARY=$(STM_COMMON)/Libraries/STM32F4xx_StdPeriph_Driver/build
 CC=arm-none-eabi-gcc
 OBJCOPY=arm-none-eabi-objcopy
 
-CFLAGS  = -g -O2 -Wall -T./ldscripts/stm32_flash.ld 
+CFLAGS  = -g -O0 -Wall -T./ldscripts/stm32_flash.ld 
 CFLAGS += -mlittle-endian -mthumb -mcpu=cortex-m4 -mthumb-interwork
 CFLAGS += --specs=nosys.specs
 #CFLAGS += -mfloat-abi=hard -mfpu=fpv4-sp-d16
