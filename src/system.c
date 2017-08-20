@@ -17,16 +17,18 @@ void SysTick_Handler(void){
 void systemInit(void){
   RCC_ClocksTypeDef clocks;
   uint32_t sysCoreClock = 0;
+  uint32_t ticks = 0xFFFFFF;
 
   RCC_GetClocksFreq(&clocks);
   sysCoreClock = clocks.SYSCLK_Frequency;
 
-  // Generate 1K hz for ms
-  //if(SysTick_Config(sysCoreClock / 1000)){
-  if(SysTick_Config(0xFFFFFF - 1)){
-    // TODO Error Handler
-    //USART_puts(USART1, "sysTick is not supported! \r\n");
-  }
+  SysTick->LOAD  = (ticks & SysTick_LOAD_RELOAD_Msk) - 1;      /* set reload register */
+  // DBG : This will make -g0 fail ...
+  //NVIC_SetPriority (SysTick_IRQn, (1<<__NVIC_PRIO_BITS) - 1);  /* set Priority for Cortex-M0 System Interrupts */
+  SysTick->VAL   = 0;                                          /* Load the SysTick Counter Value */
+  SysTick->CTRL  = SysTick_CTRL_CLKSOURCE_Msk |
+                   SysTick_CTRL_TICKINT_Msk   |
+                   SysTick_CTRL_ENABLE_Msk;                    /* Enable SysTick IRQ and SysTick Timer */
 
   // Init usTicks
   cycleCounterInit();

@@ -51,7 +51,7 @@ static Task gTasks[TASK_TOTAL] = {
   },
   [TASK_TEST] = {
     .taskName = "Test",
-    .taskFunc = task1,
+    .taskFunc = task2,
     .periodExecuteTime = TASK_PEROID_HZ(1),
     .staticPriority = PRIORITY_MEDIUM
   },

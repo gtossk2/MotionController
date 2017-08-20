@@ -50,10 +50,11 @@ int main(){
   initUSART1(115200);
   USART_puts(USART1, "Test Uart Complete! \r\n");
   
-  systemInit();
+  //systemInit();
   //init_PWM_Configuration(2);
 
   if(schedulerInit()){
+    systemInit();
     thread_start();
   } else {
     USART_puts(USART1, "Scheduler initialize fails ... end \n");
